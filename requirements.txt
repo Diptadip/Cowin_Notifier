@@ -1,0 +1,5 @@
+requests
+pygame
+openpyxl
+datetime
+xlwt

@@ -1,7 +1,5 @@
 import openpyxl
-import xlwt
 import requests
-from xlwt import Workbook
 from pygame import mixer
 from datetime import datetime, timedelta
 import time
@@ -19,22 +17,31 @@ class sess:
     s_vaccine=""
 
 #-----------Initialising the final result excel file ---------------
-
 # Workbook is created
-wb = Workbook()
-  
-# add_sheet is used to create sheet.
-sheet1 = wb.add_sheet('Sheet 1')
+wb = openpyxl.load_workbook("final_results.xlsx")
+sheet=wb["Sheet"]
 
-style = xlwt.easyxf('font: bold 1')
-sheet1.write(0, 1, 'center id',style)
-sheet1.write(0, 2, 'center name',style)
-sheet1.write(0, 3, 'center address',style)
-sheet1.write(0, 4, 'center pincode',style)
-sheet1.write(0, 5, 'session id',style)
-sheet1.write(0, 6, 'date',style)
-sheet1.write(0, 7, 'Available capacity',style)
-sheet1.write(0, 8, 'vaccine type',style)
+def delSheet(sheet):
+  
+    # continuously delete row 2 untill there
+    # is only a single row left over 
+    # that contains column names 
+    while(sheet.max_row > 1):
+        # this method removes the row 2
+        sheet.delete_rows(2)
+    # return to main function
+    return
+
+def putHeader(sheet):
+    sheet.cell(row=1,column= 1).value='center id'
+    sheet.cell(row=1,column= 2).value= 'center name'
+    sheet.cell(row=1,column= 3).value= 'center address'
+    sheet.cell(row=1,column= 4).value= 'center pincode'
+    sheet.cell(row=1,column= 5).value= 'session id'
+    sheet.cell(row=1,column= 6).value= 'date'
+    sheet.cell(row=1,column= 7).value= 'Available capacity'
+    sheet.cell(row=1,column= 8).value= 'vaccine type'
+
 
 #----------------The excel file to get state and district input-----------
  
@@ -116,8 +123,8 @@ while flag:
 print("Enter age")
 age=int(input())
 
-print("Enter max days")
-num_days=int(input())
+#print("Enter max days")
+#num_days=int(input())
 
 flag=True
 dose=1
@@ -136,7 +143,8 @@ print(dist_id)
 #----------------formatting dates to search date wise-------------
 
 date_today=datetime.today()
-list_format=[date_today + timedelta(days=i) for i in range(num_days)]
+#list_format=[date_today + timedelta(days=i) for i in range(num_days)]
+list_format=[date_today + timedelta(days=i) for i in range(2)]
 actual_dates=[i.strftime("%d-%m-%Y")for i in list_format]
 
 ans="y"
@@ -186,16 +194,18 @@ while c<2:
 
 #sorting the slots in lexicographic orders of the center
 session_list.sort(key=lambda x: x.c_name)
+delSheet(sheet)
+putHeader(sheet)
 for i in range(len(session_list)):
-    j=i+1
-    sheet1.write(j,1,session_list[i].c_id)
-    sheet1.write(j,2,session_list[i].c_name)
-    sheet1.write(j,3,session_list[i].c_address)
-    sheet1.write(j,4,session_list[i].c_pin)
-    sheet1.write(j,5,session_list[i].s_id)
-    sheet1.write(j,6,session_list[i].s_date)
-    sheet1.write(j,7,session_list[i].s_capacity)
-    sheet1.write(j,8,session_list[i].s_vaccine)
+    j=i+2
+    sheet.cell(row=j,column=1,).value=session_list[i].c_id
+    sheet.cell(row=j,column=2,).value=session_list[i].c_name
+    sheet.cell(row=j,column=3,).value=session_list[i].c_address
+    sheet.cell(row=j,column=4,).value=session_list[i].c_pin
+    sheet.cell(row=j,column=5,).value=session_list[i].s_id
+    sheet.cell(row=j,column=6,).value=session_list[i].s_date
+    sheet.cell(row=j,column=7,).value=session_list[i].s_capacity
+    sheet.cell(row=j,column=8,).value=session_list[i].s_vaccine
 
 wb.save("final_results.xlsx")    
     
@@ -205,14 +215,3 @@ for x in session_list:
     print(x.s_id)
     print(x.s_date)
     print("\n")
-
-
-
-
-
-
-
-
-
-
-
